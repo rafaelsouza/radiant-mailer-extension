@@ -76,7 +76,7 @@ module MailerTags
     tag.attr['id'] ||= 'mailer'
     results = []
     action = Radiant::Config['mailer.post_to_page?'] ? tag.locals.page.url : "/pages/#{tag.locals.page.id}/mail##{tag.attr['id']}"
-    results << %(<form action="#{action}" method="post" #{mailer_attrs(tag)}>)
+    results << %(<form action="#{action}" method="post" enctype="multipart/form-data" #{mailer_attrs(tag)}>)
     results <<   tag.expand
     results << %(</form>)
     results << %(<script type="text/javascript">new Validation('#{tag.attr['id']}',{immediate : true, useTitles : true});</script>)
@@ -227,7 +227,9 @@ module MailerTags
       element = tag.locals.page.last_mail.data
     end
     if name
-      format_mailer_data(element, name)
+      mail.data[name].is_a?(Array) ? mail.data[name].to_sentence :
+        mail.data[name].respond_to?(:original_filename) ? mail.data[name].original_filename :
+        mail.data[name]
     else
       element.to_hash.to_yaml.to_s
     end
