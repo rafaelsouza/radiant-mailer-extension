@@ -312,6 +312,7 @@ describe "MailerTags" do
       @page.last_mail = @mail = Mail.new(@page, @page.config, 'file' => file)
       @page.should render('<r:mailer:get name="file" />').as('readme.txt')
     end
+
   end
   
   describe "<r:mailer:if_value>" do
