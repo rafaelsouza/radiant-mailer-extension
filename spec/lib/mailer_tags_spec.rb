@@ -271,46 +271,27 @@ describe "MailerTags" do
       @page.should render('<r:mailer:get name="body" />').as('')
     end
     
-    it "should render date when date params are detected" do
-      @page.last_mail = @mail = Mail.new(@page, @page.config, 'foo(1i)' => '2008', 'foo(2i)' => '10', 'foo(3i)' => '29')
-      @page.should render('<r:mailer:get name="foo" />').as('2008-10-29')
-    end
-  end
-  
-  describe "<r:mailer:get_each>" do
-    before :each do
-      # This simulates variables like :
-      #   products[0][qty]=10
-      #   products[0][name]=foo
-      #   products[1][qty]=5
-      #   products[1][name]=bar
-      test_array=[ { 'qty' => 10, 'name' => 'foo' }, 
-                   { 'qty' => 5, 'name' => 'bar' } ]
-      @page = pages(:mail_form)
-      @page.last_mail = @mail = Mail.new(@page, @page.config, 'qty' => 'wrong', 'products' => test_array)
-    end
-    
-    it "should not alter the content on its own" do
-      @page.should render('<r:mailer:get_each />').as('')
-    end
-    
-    it "should make mailer:get use the local variables" do
-      # If this fails, it will show "wrongwrong" or something like that
-      @page.should render('<r:mailer:get_each name="products"><r:mailer:get name="qty" /></r:mailer:get_each>').as('105')
-    end
-    
-    it "should iterate and provide mailer:get the local variables" do
-      @page.should render('<r:mailer:get_each name="products"><r:mailer:get name="qty" />x<r:mailer:get name="name" />,</r:mailer:get_each>').as('10xfoo,5xbar,')
-    end
-    
-    it "should provide mailer:index" do
-      @page.should render('<r:mailer:get_each name="products"><r:mailer:index /><r:mailer:get name="name" /></r:mailer:get_each>').as('0foo1bar')
-    end
-    
-    it "should render original_filename if respond" do
-      file = mock(StringIO, :original_filename => "readme.txt")
-      @page.last_mail = @mail = Mail.new(@page, @page.config, 'file' => file)
-      @page.should render('<r:mailer:get name="file" />').as('readme.txt')
+    describe 'if responds to original_filename' do
+      it "should render it for single files" do
+        file = mock(StringIO, :original_filename => "readme.txt")
+        @page.last_mail = @mail = Mail.new(@page, @page.config, 'file' => file)
+        @page.should render('<r:mailer:get name="file" />').as('readme.txt')
+      end
+      # It is valid to have 2 files on a single input name
+      it "should render them as sentence for 2 files" do
+        file = mock(StringIO, :original_filename => "readme.txt")
+        file2 = mock(StringIO, :original_filename => "install.txt")
+        @page.last_mail = @mail = Mail.new(@page, @page.config, 'file' => [file, file2])
+        @page.should render('<r:mailer:get name="file" />').as('readme.txt and install.txt')
+      end
+      # It is valid to have multiple files on a single input name
+      it "should render them as sentence for multiple files" do
+        file = mock(StringIO, :original_filename => "readme.txt")
+        file2 = mock(StringIO, :original_filename => "install.txt")
+        file3 = mock(StringIO, :original_filename => "rakefile")
+        @page.last_mail = @mail = Mail.new(@page, @page.config, 'file' => [file, file2, file3])
+        @page.should render('<r:mailer:get name="file" />').as('readme.txt, install.txt, and rakefile')
+      end
     end
 
   end

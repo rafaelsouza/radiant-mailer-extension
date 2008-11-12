@@ -227,9 +227,13 @@ module MailerTags
       element = tag.locals.page.last_mail.data
     end
     if name
-      mail.data[name].is_a?(Array) ? mail.data[name].to_sentence :
-        mail.data[name].respond_to?(:original_filename) ? mail.data[name].original_filename :
+      if mail.data[name].is_a?(Array)
+        mail.data[name].map{ |d| d.respond_to?(:original_filename) ? d.original_filename : d.to_s }.to_sentence
+      elsif mail.data[name].respond_to?(:original_filename)
+        mail.data[name].original_filename
+      else
         mail.data[name]
+      end
     else
       element.to_hash.to_yaml.to_s
     end
