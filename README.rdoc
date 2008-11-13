@@ -30,6 +30,7 @@ The following tags are available to help you build the form:
   <r:mailer:textarea name=""> ... </r:mailer:textarea>
   <r:mailer:option name="" />
   <r:mailer:submit name="" />
+  <r:mailer:image name="" />
   <r:mailer:submit_placeholder />
   
 When processing the form (in email and email_html), the following tags are 
