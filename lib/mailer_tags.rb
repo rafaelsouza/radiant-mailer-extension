@@ -80,6 +80,25 @@ module MailerTags
     results <<   tag.expand
     results << %(</form>)
     results << %(<script type="text/javascript">new Validation('#{tag.attr['id']}',{immediate : true, useTitles : true});</script>)
+    results << %(
+<script type="text/javascript">
+  function disableSubmitButtons()
+  {
+    var buttons = document.getElementsByName("mailer[mailer-form-button]");
+    for( var idx = 0; idx < buttons.length; idx++ )
+    {
+      buttons[idx].disabled = true;
+    }
+  }
+  function showSubmitPlaceholder()
+  {
+    var submitplaceholder = document.getElementById("submit-placeholder-part");
+    if (submitplaceholder != null)
+    {
+      submitplaceholder.style.display="";
+    }
+  }
+</script>)
   end
 
   desc %{
@@ -106,7 +125,7 @@ module MailerTags
     #raise_error_if_name_missing "mailer:submit", tag.attr
     value = tag.attr['value'] || tag.attr['name']
     tag.attr.merge!("name" => "mailer-form-button")
-    result = [%(<input type="submit" value="#{value}" #{mailer_attrs(tag)} />)]
+    result = [%(<input onclick="disableSubmitButtons(); showSubmitPlaceholder();" type="submit" value="#{value}" #{mailer_attrs(tag)} />)]
   end
 
   desc %{
