@@ -79,6 +79,7 @@ module MailerTags
     results << %(<form action="#{action}" method="post" #{mailer_attrs(tag)}>)
     results <<   tag.expand
     results << %(</form>)
+    results << %(<script type="text/javascript">new Validation('#{tag.attr['id']}',{immediate : true, useTitles : true});</script>)
   end
 
   desc %{
