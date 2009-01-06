@@ -75,7 +75,12 @@ module MailerTags
   tag "mailer:form" do |tag|
     tag.attr['id'] ||= 'mailer'
     results = []
-    action = Radiant::Config['mailer.post_to_page?'] ? tag.locals.page.url : "/pages/#{tag.locals.page.id}/mail##{tag.attr['id']}"
+    if defined?(SiteLanguage) && SiteLanguage.count > 0
+      url = "/#{Locale.language.code}" + tag.locals.page.url
+    else
+      url = tag.locals.page.url
+    end
+    action = Radiant::Config['mailer.post_to_page?'] ? url : "/pages/#{tag.locals.page.id}/mail##{tag.attr['id']}"
     results << %(<form action="#{action}" method="post" #{mailer_attrs(tag)}>)
     results <<   tag.expand
     results << %(</form>)
