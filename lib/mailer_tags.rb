@@ -284,10 +284,13 @@ module MailerTags
   end
 
   def mailer_attrs(tag, extras={})
+    classes = tag.attr['class'] ? tag.attr['class'].split(' ') : []
+    classes << tag.attr['required'].split(' ')[1..-1] << 'required' if tag.attr['required']
     attrs = {
       'id' => tag.attr['name'],
-      'class' => nil,
-      'size' => nil}.merge(extras)
+      'class' => classes.join(' '),
+      'size' => nil,
+      'title' => nil}.merge(extras)
     result = attrs.collect do |k,v|
       v = (tag.attr[k] || v)
       next if v.blank?
