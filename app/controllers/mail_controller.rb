@@ -14,7 +14,19 @@ class MailController < ApplicationController
     process_mail(mail, config)
 
     if mail.send
-      redirect_to (config[:redirect_to] || "#{@page.url}#mail_sent")
+      if !request.parameters[:send_to_maillist].nil?
+        # is mailbuild set up properly?
+        if config.has_key? :mb_url
+          # We get url's like http://gorilla.createsend.com/t/1/s/tlirt/
+          # We post to url's like http://gorilla.createsend.com/t/1/s/tlirt/?mb-name=#{name}&mb-tlirt-tlirt=#{email}
+          email_field = config[:mb_url].split('/').last
+          response.redirect("#{@form_conf[:mb_url]}?mb-name=#{@form_data['naam']}&mb-#{email_field}-#{email_field}=#{@form_data['email']}", "302 Found")
+        else
+          raise MailerTagError("Mailbuild is not properly set up.")
+        end
+      else
+        redirect_to (config[:redirect_to] || "#{@page.url}#mail_sent")
+      end
     else
       render :text => @page.render
     end
