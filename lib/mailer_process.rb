@@ -15,10 +15,22 @@ module MailerProcess
       self.last_mail = part_page.last_mail = mail
 
       if mail.send
-        response.redirect(config[:redirect_to], "302 Found") and return if config[:redirect_to]
-        # Clear out the data and errors so the form isn't populated, but keep the success status around.
-        self.last_mail.data.delete_if { true }
-        self.last_mail.errors.delete_if { true }
+        if !request.parameters[:send_to_maillist].nil?
+          # is mailbuild set up properly?
+          if config.has_key? :mb_url
+            # We get url's like http://gorilla.createsend.com/t/1/s/tlirt/
+            # We post to url's like http://gorilla.createsend.com/t/1/s/tlirt/?mb-name=#{name}&mb-tlirt-tlirt=#{email}
+            email_field = config[:mb_url].split('/').last
+            response.redirect("#{@form_conf[:mb_url]}?mb-name=#{@form_data['naam']}&mb-#{email_field}-#{email_field}=#{@form_data['email']}", "302 Found")
+          else
+            raise MailerTagError("Mailbuild is not properly set up.")
+          end
+        else
+          response.redirect(config[:redirect_to], "302 Found") and return if config[:redirect_to]
+          # Clear out the data and errors so the form isn't populated, but keep the success status around.
+          self.last_mail.data.delete_if { true }
+          self.last_mail.errors.delete_if { true }
+        end
       end
     end
     process_without_mailer(request, response)
