@@ -91,7 +91,6 @@ module MailerTags
     }
   }
 </script>)
-    results << %(<script type="text/javascript">new Validation('#{tag.attr['id']}',{immediate : true, useTitles : true});</script>)
   end
 
   desc %{
