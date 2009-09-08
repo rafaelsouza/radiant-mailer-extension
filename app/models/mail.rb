@@ -53,7 +53,7 @@ class Mail
       if @required
         @required.each do |name, msg|
           if "as_email" == msg
-            unless valid_email?(data[name])
+            unless valid_email?(data[name]) 
               errors[name] = "invalid email address."
               @valid = false
             end
@@ -61,6 +61,11 @@ class Mail
             regex = Regexp.new(m[1])
             unless data[name] =~ regex
               errors[name] = "doesn't match regex (#{m[1]})"
+              @valid = false
+            end
+          elsif "as_phone" == msg
+            unless data[name].length == 10
+              errors[name] = "invalid phone number"
               @valid = false
             end
           else
@@ -154,7 +159,7 @@ The following information was posted:
   protected
 
   def valid_email?(email)
-    (email.blank? ? true : email =~ /^[^@]+@([^@.]+\.)[^@]+$/)
+    (email.blank? ? false : email =~ /^[^@]+@([^@.]+\.)[^@]+$/)
   end
   
   def is_required_field?(field_name)
