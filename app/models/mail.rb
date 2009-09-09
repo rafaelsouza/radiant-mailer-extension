@@ -64,7 +64,7 @@ class Mail
               @valid = false
             end
           elsif "as_phone" == msg
-            unless data[name].to_i != 0 && data[name].length == 10
+            unless data[name].to_i != 0 && data[name].length > 10 && data[name].length < 13
               errors[name] = "invalid phone number"
               @valid = false
             end
