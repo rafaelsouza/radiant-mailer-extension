@@ -58,7 +58,7 @@ class Mail
               @valid = false
             end
           elsif "as_phone" == msg
-            clean_phone = data[name].strip
+            clean_phone = clean_phone.gsub(/\s/, '')
             unless clean_phone.to_i != 0 && clean_phone.length > 10 && clean_phone.length < 13
               errors[name] = "invalid phone number"
               @valid = false
