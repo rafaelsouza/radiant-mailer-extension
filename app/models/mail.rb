@@ -57,16 +57,16 @@ class Mail
               errors[name] = "invalid email address."
               @valid = false
             end
-          elsif m = msg.match(/\/(.*)\//)
-            regex = Regexp.new(m[1])
-            unless data[name] =~ regex
-              errors[name] = "doesn't match regex (#{m[1]})"
-              @valid = false
-            end
           elsif "as_phone" == msg
             clean_phone = data[name].strip
             unless clean_phone.to_i != 0 && clean_phone.length > 10 && clean_phone.length < 13
               errors[name] = "invalid phone number"
+              @valid = false
+            end
+          elsif m = msg.match(/\/(.*)\//)
+            regex = Regexp.new(m[1])
+            unless data[name] =~ regex
+              errors[name] = "doesn't match regex (#{m[1]})"
               @valid = false
             end
           else
