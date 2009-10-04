@@ -10,7 +10,7 @@ class Mail
   def self.valid_config?(config)
     config_errors(config).empty?
   end
-  
+
   def self.config_errors(config)
     config_errors = {}
     %w(recipients from).each do |required_field|
@@ -20,7 +20,7 @@ class Mail
     end
     config_errors
   end
-  
+
   def self.config_error_messages(config)
     config_errors(config).collect do |field, message|
       "'#{field}' #{message}"
@@ -53,13 +53,19 @@ class Mail
       if @required
         @required.each do |name, msg|
           if "as_email" == msg
-            unless valid_email?(data[name]) 
+            unless valid_email?(data[name])
               errors[name] = "invalid email address."
               @valid = false
             end
           elsif "as_phone" == msg
             clean_phone = data[name].gsub(/\s/, '')
             unless clean_phone.to_i != 0 && clean_phone.length > 9 && clean_phone.length < 13
+              errors[name] = "invalid phone number"
+              @valid = false
+            end
+          elsif "as_phone_us" == msg
+            clean_phone = data[name].gsub(/\s/, '')
+            unless clean_phone.to_i != 0 && clean_phone.length > 12 && clean_phone.length < 16
               errors[name] = "invalid phone number"
               @valid = false
             end
@@ -80,7 +86,7 @@ class Mail
     end
     @valid
   end
-  
+
   def from
     config[:from] || data[config[:from_field]]
   end
@@ -100,11 +106,11 @@ class Mail
   def subject
     data[:subject] || config[:subject] || "Form Mail from #{page.request.host}"
   end
-  
+
   def cc
     data[config[:cc_field]] || config[:cc] || ""
   end
-  
+
   def files
     res = []
     data.each_value do |d|
@@ -112,7 +118,7 @@ class Mail
     end
     res
   end
-  
+
   def filesize_limit
     config[:filesize_limit] || 0
   end
@@ -162,8 +168,9 @@ The following information was posted:
   def valid_email?(email)
     (email.blank? ? false : email =~ /^[^@]+@([^@.]+\.)[^@]+$/)
   end
-  
+
   def is_required_field?(field_name)
     @required && @required.any? {|name,_| name == field_name}
   end
 end
+
